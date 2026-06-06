@@ -728,7 +728,10 @@ export class AiService {
     parts.push('2. 分类字段（能源类型、级别等）使用 data->>\'字段名\' = \'精确值\' 精确匹配');
     parts.push('3. 车型名称、厂商等文本字段使用 data->>\'字段名\' LIKE \'%关键词%\' 模糊搜索');
     parts.push('4. 多个条件之间用 AND 连接（缩小范围）或 OR 连接（扩大范围）');
-    parts.push('5. 数值字段（价格、马力等）使用 (data->>\'字段名\')::numeric >= 值');
+    parts.push('5. 数值字段比较规则（极其重要）：');
+    parts.push('   - "厂商指导价(元)"字段的值单位是"元"。用户说的"万"需要换算！如"30万以上"→(data->>\'厂商指导价(元)\')::numeric >= 300000');
+    parts.push('   - "10万以下"→(data->>\'厂商指导价(元)\')::numeric < 100000，"15-20万"→>= 150000 AND <= 200000');
+    parts.push('   - 其他数值字段（马力、轴距等）直接使用： (data->>\'字段名\')::numeric >= 值');
     parts.push('6. sqlCondition 只输出 PostgreSQL WHERE 子句的条件部分，不要包含 WHERE 关键字、SELECT、FROM');
     parts.push('7. 字段名含括号时必须完整保留，如 data->>\'座位数(个)\'');
     parts.push('8. 如果用户问题同时提到能源类型和车型类别，你的 sqlCondition 中必须同时出现 能源类型 和 级别 两个字段的条件！');
