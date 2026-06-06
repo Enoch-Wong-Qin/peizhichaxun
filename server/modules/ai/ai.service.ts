@@ -318,6 +318,8 @@ export class AiService {
           searchKeywords: plan.searchKeywords || [],
           suggestedColumns: plan.suggestedColumns || [],
           simplifiedQuery: plan.simplifiedQuery || '',
+          coveredConstraints: plan.coveredConstraints ?? [],
+          missedConstraints: plan.missedConstraints ?? [],
         },
       };
     } catch (error) {
