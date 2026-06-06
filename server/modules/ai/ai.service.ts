@@ -168,20 +168,20 @@ export class AiService {
       }
     }
 
-    // 级别约束
-    const levelTerms = ['SUV', '轿车', 'MPV', '跑车', '皮卡', '越野', '微面',
-      '紧凑型', '中型', '中大型', '大型', '小型', '微型', '全尺寸'];
+    // 级别约束 — 可能同时有多个：如"中大型SUV"= ["中大型", "SUV"]
+    const levelTerms = ['紧凑型', '中型', '中大型', '大型', '小型', '微型', '全尺寸',
+      'SUV', '轿车', 'MPV', '跑车', '皮卡', '越野', '微面'];
     for (const term of levelTerms) {
       if (lower.includes(term)) {
         constraints.push(`级别:${term}`);
-        break;
+        // 不 break，继续找其他级别词（如"中大型SUV"→两条）
       }
     }
 
-    // 价格约束
+    // 价格约束（列名是"厂商指导价(元)"，用户说"万"时要×10000）
     const priceMatch = prompt.match(/(\d+)\s*万\s*(?:以[下上内]|左右|以下|以上|以内|左右)?/);
     if (priceMatch) {
-      constraints.push(`价格:${priceMatch[0]}`);
+      constraints.push(`厂商指导价(元):${priceMatch[0]}`);
     }
 
     // 厂商/品牌约束
@@ -201,12 +201,13 @@ export class AiService {
       constraints.push(`座位数:${seatMatch[1]}`);
     }
 
-    // 驱动约束
-    const driveTerms = ['前驱', '后驱', '四驱', '两驱', '前置前驱', '前置后驱', '双电机', '单电机'];
+    // 驱动约束 — 可能同时有多个
+    const driveTerms = ['前置前驱', '前置后驱', '双电机四驱', '单电机', '双电机',
+      '四驱', '前驱', '后驱', '两驱'];
     for (const term of driveTerms) {
       if (lower.includes(term)) {
-        constraints.push(`驱动:${term}`);
-        break;
+        constraints.push(`驱动方式:${term}`);
+        // 不 break，继续找更多驱动词
       }
     }
 
@@ -779,6 +780,18 @@ export class AiService {
           sv.includes(value) || value.includes(sv),
         );
         parts.push(`  ❌ 遗漏: ${col} = "${value}" → 数据库中实际值为 "${matched || value}"，请添加 data->>'能源类型' = '${matched || value}'`);
+      } else if (col === '厂商指导价(元)') {
+        // 价格约束：处理"万"单位换算
+        const priceNum = value.match(/(\d+)\s*万/);
+        const below = value.includes('以下') || value.includes('低于');
+        const above = value.includes('以上') || value.includes('高于') || !below;
+        if (priceNum) {
+          const num = parseInt(priceNum[1]) * 10000;
+          const op = below ? `< ${num}` : `>= ${num}`;
+          parts.push(`  ❌ 遗漏: 价格约束 "${value}" → 请添加 (data->>'厂商指导价(元)')::numeric ${op}`);
+        } else {
+          parts.push(`  ❌ 遗漏: 价格约束 "${value}" → 请添加 (data->>'厂商指导价(元)')::numeric 条件`);
+        }
       } else if (hint) {
         const matched = hint.sampleValues.find((sv) =>
           sv.includes(value) || value.includes(sv),
