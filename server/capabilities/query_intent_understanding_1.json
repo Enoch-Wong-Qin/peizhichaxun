@@ -1,0 +1,58 @@
+{
+  "id": "query_intent_understanding_1",
+  "pluginKey": "@official-plugins/ai-text-to-json",
+  "pluginVersion": "1.0.22",
+  "name": "查询意图理解",
+  "description": "分析用户的自然语言查询意图，将用户查询文本和数据库列名转换为结构化的查询规划JSON，包含查询意图描述、搜索关键词、建议搜索字段和简化查询描述。",
+  "icon": "",
+  "paramsSchema": {
+    "required": [
+      "user_query",
+      "database_columns"
+    ],
+    "type": "object",
+    "properties": {
+      "user_query": {
+        "type": "string",
+        "description": "用户输入的自然语言查询文本"
+      },
+      "database_columns": {
+        "type": "string",
+        "description": "数据库可用的列名列表，逗号分隔"
+      }
+    }
+  },
+  "formValue": {
+    "modelID": "87",
+    "modelParams": {
+      "maxTokens": 8192,
+      "temperature": 0.5
+    },
+    "prompt": "你是一位专业的数据库查询意图分析专家。请分析用户的自然语言查询意图，并基于提供的数据库列名生成结构化的查询规划。\n\n用户查询：{{input.user_query}}\n数据库可用列名：{{input.database_columns}}\n\n分析要求：\n1. 准确理解用户的查询目的，清晰描述查询意图\n2. 将用户查询中的关键词进行拆分，每个关键词作为独立的搜索单元，例如\"奕派007\"应拆分为\"奕派\"和\"007\"\n3. 基于查询内容和数据库列名，推荐最适合的搜索字段\n4. 重写简化的查询描述，明确列出需要在哪些字段搜索哪些关键词\n\n请严格按照指定的JSON结构输出结果。",
+    "jsonStructure": [
+      {
+        "paramType": "String",
+        "paramDescription": "查询意图的详细描述，说明用户想要查询什么内容",
+        "name": "queryIntent"
+      },
+      {
+        "paramType": "String",
+        "paramDescription": "逗号分隔的搜索关键词列表，每个关键词是独立的搜索单元，如\"奕派\",\"007\"",
+        "name": "searchKeywords"
+      },
+      {
+        "name": "suggestedColumns",
+        "paramType": "String",
+        "paramDescription": "逗号分隔的建议搜索字段名列表，从提供的数据库列名中选择最相关的字段"
+      },
+      {
+        "name": "simplifiedQuery",
+        "paramType": "String",
+        "paramDescription": "简化重写后的查询描述，明确列出需要在哪些字段搜索哪些关键词，例如：在产品名称字段搜索\"奕派\"和\"007\""
+      }
+    ]
+  },
+  "createdAt": 1780718880233,
+  "updatedAt": 1780718880233,
+  "createdBy": 7573603412168704028
+}

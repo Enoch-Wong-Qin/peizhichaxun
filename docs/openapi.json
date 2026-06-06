@@ -1,0 +1,89 @@
+{
+  "paths": {
+    "/openapi/ai/query": {
+      "post": {
+        "operationId": "query",
+        "summary": "AI 智能数据查询，通过自然语言描述查询意图，返回结构化数据结果",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "自然语言查询描述",
+                    "example": "找出所有油耗超过 8L 的车型数据"
+                  },
+                  "page": {
+                    "type": "number",
+                    "description": "页码，从 1 开始",
+                    "example": 1
+                  },
+                  "pageSize": {
+                    "type": "number",
+                    "description": "每页返回条数",
+                    "example": 20
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "查询成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "total", "aiUnderstanding", "costTime", "columns"],
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "description": "查询结果数据列表",
+                      "items": {
+                        "type": "object",
+                        "description": "单条数据记录，字段根据导入的 CSV 列动态生成",
+                        "example": {
+                          "车型": "eπ007",
+                          "油耗": "8.5L/100km",
+                          "测试日期": "2025-12-01"
+                        }
+                      }
+                    },
+                    "total": {
+                      "type": "number",
+                      "description": "符合查询条件的总记录数",
+                      "example": 128
+                    },
+                    "aiUnderstanding": {
+                      "type": "string",
+                      "description": "AI 对查询意图的理解描述",
+                      "example": "查询油耗超过 8L 的车型测试数据"
+                    },
+                    "costTime": {
+                      "type": "number",
+                      "description": "查询耗时（毫秒）",
+                      "example": 1250
+                    },
+                    "columns": {
+                      "type": "array",
+                      "description": "数据列名列表",
+                      "items": {
+                        "type": "string",
+                        "example": "车型"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

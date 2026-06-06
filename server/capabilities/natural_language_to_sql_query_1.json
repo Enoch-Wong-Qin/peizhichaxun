@@ -1,0 +1,57 @@
+{
+  "id": "natural_language_to_sql_query_1",
+  "pluginKey": "@official-plugins/ai-text-to-json",
+  "pluginVersion": "1.0.22",
+  "name": "自然语言转SQL查询条件",
+  "description": "将用户输入的自然语言查询提示词和数据库表结构转化为结构化JSON，包含SQL查询条件、查询字段列表和查询意图理解，用于服务端执行数据库查询。",
+  "icon": "",
+  "paramsSchema": {
+    "type": "object",
+    "properties": {
+      "user_query": {
+        "type": "string",
+        "description": "用户输入的自然语言查询内容"
+      },
+      "table_columns": {
+        "description": "数据库表的列名列表，用逗号分隔",
+        "type": "string"
+      }
+    },
+    "required": [
+      "user_query",
+      "table_columns"
+    ],
+    "order": [
+      "user_query",
+      "table_columns"
+    ]
+  },
+  "formValue": {
+    "jsonStructure": [
+      {
+        "paramDescription": "SQL WHERE条件片段，例如 \"data->>'车型' LIKE '%eπ007%'",
+        "name": "sqlCondition",
+        "paramType": "String"
+      },
+      {
+        "paramDescription": "需要查询的字段名列表，用逗号分隔，查询所有字段时返回\"*\"",
+        "name": "selectFields",
+        "paramType": "String"
+      },
+      {
+        "name": "aiUnderstanding",
+        "paramType": "String",
+        "paramDescription": "AI对查询意图的中文理解描述，用于前端展示"
+      }
+    ],
+    "modelID": "2006",
+    "modelParams": {
+      "maxTokens": 8192,
+      "temperature": 0.5
+    },
+    "prompt": "你是一位专业的数据库查询解析专家，擅长将自然语言查询转换为PostgreSQL JSON类型查询语句。\n\n用户查询需求：{{input.user_query}}\n数据库表可用列名：{{input.table_columns}}\n\n请根据以上信息完成转换：\n1. 生成PostgreSQL兼容的SQL WHERE条件片段，JSON类型字段使用->>运算符访问\n2. 提取需要查询的字段名，用逗号分隔\n3. 用简洁中文描述用户的查询意图\n\n注意：\n- 只返回符合JSON结构要求的内容，不要额外解释\n- 没有匹配的条件时sqlCondition返回空字符串\n- 需要查询所有字段时selectFields返回\"*\"\n- aiUnderstanding要准确反映用户需求"
+  },
+  "createdAt": 1780673320732,
+  "updatedAt": 1780687289503,
+  "createdBy": 7573603412168704028
+}
